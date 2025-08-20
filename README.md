@@ -47,7 +47,7 @@ If you find this project useful, please consider supporting us:
 **Bank Transfer (Lowest Fees):**
 - **IBAN**: BE70 9051 5229 1825
 - **BIC/SWIFT**: WIREDEMMXXX
-- **Account Holder**: Kiliaan V
+- **Account Holder**: Baker Street Project
 - **Bank**: Wise (formerly TransferWise)
 - **Wise Tag**: @kiliaanv
 

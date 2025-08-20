@@ -8,7 +8,7 @@ For the most cost-effective way to support us:
 
 **IBAN**: BE70 9051 5229 1825
 **BIC/SWIFT**: WIREDEMMXXX
-**Account Holder**: Kiliaan V
+**Account Holder**: Baker Street Project
 **Bank**: Wise (formerly TransferWise)
 **Wise Tag**: @kiliaanv
 
