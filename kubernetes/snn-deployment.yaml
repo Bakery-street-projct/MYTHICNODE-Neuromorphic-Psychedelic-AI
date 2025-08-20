@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: snn-deployment
+  labels:
+    app: snn-simulator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: snn-simulator
+  template:
+    metadata:
+      labels:
+        app: snn-simulator
+    spec:
+      containers:
+      - name: snn-simulator
+        image: neuromorphic/snn:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8002
+        env:
+        - name: KAFKA_BROKER
+          value: "kafka-service:9092"
+        - name: SNN_CONFIG_PATH
+          value: "/app/configs/snn_config.yaml"
+        - name: PYTHONPATH
+          value: "/app"
+        - name: OMP_NUM_THREADS
+          value: "4"
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/configs
+        - name: data-volume
+          mountPath: /app/data
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8002
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8002
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: config-volume
+        configMap:
+          name: snn-config
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: neuromorphic-data-pvc
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: snn-service
+spec:
+  selector:
+    app: snn-simulator
+  ports:
+    - protocol: TCP
+      port: 8002
+      targetPort: 8002
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: snn-config
+data:
+  snn_config.yaml: |
+    network:
+      N_total: 800
+      I_baseline: 0.5
+      tau_membrane: 10
+      tau_synaptic: 5
+      tau_modulatory: 50
+    connectivity:
+      exc_exc_prob: 0.1
+      exc_inh_prob: 0.2
+      inh_exc_prob: 0.4
+    synapses:
+      w_max_exc: 0.8
+      w_exc_inh: 0.6
+      w_inh_exc: 1.2
+      tau_pre: 20
+      tau_post: 20
+      A_pre: 0.01
+      A_post: -0.012
+    grid_cells:
+      grid_size: 20
+      spacing: 1.0
+      scale_factor: 0.8
+    psychedelic_modulation:
+      serotonin_level: 0.0
+      inhibition_reduction: 0.5
+      excitation_increase: 0.3
+      noise_variance: 0.1
+    simulation:
+      timestep: 0.1
+      duration: 1000
+      recording_interval: 10

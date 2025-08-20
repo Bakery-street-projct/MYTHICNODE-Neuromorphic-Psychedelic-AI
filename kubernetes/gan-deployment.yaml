@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gan-deployment
+  labels:
+    app: gan-inference
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gan-inference
+  template:
+    metadata:
+      labels:
+        app: gan-inference
+    spec:
+      containers:
+      - name: gan-inference
+        image: neuromorphic/gan:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8001
+        env:
+        - name: KAFKA_BROKER
+          value: "kafka-service:9092"
+        - name: MODEL_PATH
+          value: "/app/models/hexagonal_stylegan.onnx"
+        - name: USE_TENSORRT
+          value: "true"
+        - name: CUDA_VISIBLE_DEVICES
+          value: "0"
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "1000m"
+            nvidia.com/gpu: 1
+          limits:
+            memory: "8Gi"
+            cpu: "2000m"
+            nvidia.com/gpu: 1
+        volumeMounts:
+        - name: model-volume
+          mountPath: /app/models
+        - name: generated-images-volume
+          mountPath: /app/generated_images
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+      - name: model-volume
+        persistentVolumeClaim:
+          claimName: model-storage-pvc
+      - name: generated-images-volume
+        emptyDir: {}
+      nodeSelector:
+        accelerator: nvidia-tesla-gpu
+      tolerations:
+      - key: nvidia.com/gpu
+        operator: Exists
+        effect: NoSchedule
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gan-service
+spec:
+  selector:
+    app: gan-inference
+  ports:
+    - name: api
+      protocol: TCP
+      port: 8001
+      targetPort: 8001
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: model-storage-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: fast-ssd

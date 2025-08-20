@@ -1,0 +1,64 @@
+# Control Configuration - Adaptive Feedback System Parameters
+controller:
+  type: "PID"                     # PID, MPC, fuzzy
+  update_rate: 10                 # Control update frequency (Hz)
+  
+pid_params:
+  kp: 2.0                         # Proportional gain
+  ki: 0.1                         # Integral gain  
+  kd: 0.05                        # Derivative gain
+  setpoint: 0.5                   # Target neural activity level
+  output_limits: [0.0, 1.0]      # Control signal limits
+  sample_time: 0.1                # PID sample time (seconds)
+
+mpc_params:
+  prediction_horizon: 10          # MPC prediction horizon
+  control_horizon: 3              # MPC control horizon
+  state_constraints:
+    firing_rate: [0.1, 2.0]      # Firing rate bounds (Hz)
+    synchrony: [0.0, 1.0]         # Neural synchrony bounds
+  input_constraints:
+    latent_scale: [0.0, 2.0]      # GAN latent scaling bounds
+    color_intensity: [0.0, 1.0]   # Color modulation bounds
+
+target_states:
+  baseline_firing_rate: 0.5       # Target baseline firing rate (Hz)
+  psychedelic_firing_rate: 1.2    # Target psychedelic state firing rate
+  synchrony_level: 0.3            # Target neural synchrony
+  entropy_level: 0.7              # Target neural entropy
+
+stimulus_parameters:
+  visual:
+    latent_scale_range: [0.5, 2.0]
+    color_hue_range: [0.0, 360.0]
+    saturation_range: [0.5, 1.0]
+    brightness_range: [0.3, 1.0]
+    morph_speed_range: [0.1, 2.0]
+    tessellation_range: [0.5, 3.0]
+  
+  audio:
+    binaural_beat_range: [4.0, 40.0]  # Hz
+    amplitude_range: [0.0, 0.8]
+    carrier_freq_range: [200, 800]    # Hz
+
+safety_limits:
+  max_firing_rate: 5.0            # Maximum allowable firing rate (Hz)
+  min_firing_rate: 0.05           # Minimum allowable firing rate (Hz)
+  max_modulation_level: 0.8       # Maximum psychedelic modulation
+  emergency_stop_threshold: 10.0  # Emergency stop firing rate (Hz)
+
+adaptation:
+  learning_rate: 0.01             # Adaptive parameter learning rate
+  memory_length: 100              # Number of past states to remember
+  adaptation_threshold: 0.1       # Threshold for parameter adaptation
+  
+feedback_sources:
+  neural_activity_weight: 0.5     # Weight of neural activity feedback
+  biosignal_weight: 0.3           # Weight of biosignal feedback
+  user_input_weight: 0.2          # Weight of manual user input
+
+logging:
+  log_level: "INFO"
+  log_control_signals: true
+  log_target_tracking: true
+  log_safety_violations: true

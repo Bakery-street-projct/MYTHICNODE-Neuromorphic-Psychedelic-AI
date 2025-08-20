@@ -1,0 +1,37 @@
+# SNN Configuration - Spiking Neural Network Parameters
+network:
+  N_total: 800                    # Total number of neurons
+  I_baseline: 0.5                 # Baseline input current
+  tau_membrane: 10                # Membrane time constant (ms)
+  tau_synaptic: 5                 # Synaptic time constant (ms)
+  tau_modulatory: 50              # Modulatory time constant (ms)
+
+connectivity:
+  exc_exc_prob: 0.1               # Excitatory-to-excitatory connection probability
+  exc_inh_prob: 0.2               # Excitatory-to-inhibitory connection probability
+  inh_exc_prob: 0.4               # Inhibitory-to-excitatory connection probability
+
+synapses:
+  w_max_exc: 0.8                  # Maximum excitatory synaptic weight
+  w_exc_inh: 0.6                  # Excitatory-to-inhibitory weight
+  w_inh_exc: 1.2                  # Inhibitory-to-excitatory weight
+  tau_pre: 20                     # Pre-synaptic STDP time constant (ms)
+  tau_post: 20                    # Post-synaptic STDP time constant (ms)
+  A_pre: 0.01                     # Pre-synaptic STDP amplitude
+  A_post: -0.012                  # Post-synaptic STDP amplitude
+
+grid_cells:
+  grid_size: 20                   # Grid cell module size (NxN)
+  spacing: 1.0                    # Hexagonal grid spacing
+  scale_factor: 0.8               # Grid scale modulation
+
+psychedelic_modulation:
+  serotonin_level: 0.0            # Serotonin-like modulation (0-1)
+  inhibition_reduction: 0.5       # Reduction in inhibitory strength
+  excitation_increase: 0.3        # Increase in excitatory strength
+  noise_variance: 0.1             # Added neural noise variance
+
+simulation:
+  timestep: 0.1                   # Simulation timestep (ms)
+  duration: 1000                  # Default simulation duration (ms)
+  recording_interval: 10          # Data recording interval (ms)

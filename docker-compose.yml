@@ -1,0 +1,86 @@
+# Multi-service Docker setup for Neuromorphic Psychedelic-AI Framework
+# neuromorphic-psychedelic-ai/docker-compose.yml
+
+version: '3.8'
+
+services:
+  # Kafka message broker for streaming between SNN and GAN
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka-broker
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "29092:29092"
+    depends_on:
+      - zookeeper
+
+  # Zookeeper for Kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  # Spiking Neural Network simulation service
+  snn-simulator:
+    build:
+      context: .
+      dockerfile: Dockerfile.snn
+    container_name: snn-simulator
+    depends_on:
+      - kafka
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./configs:/app/configs
+      - ./src:/app/src
+
+  # GAN inference service for visual generation
+  gan-inference:
+    build:
+      context: .
+      dockerfile: Dockerfile.gan
+    container_name: gan-inference
+    depends_on:
+      - kafka
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./configs:/app/configs
+      - ./src:/app/src
+      - ./models:/app/models
+
+  # UI dashboard for visualization and control
+  ui-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.ui
+    container_name: ui-dashboard
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./ui:/app/ui
+    depends_on:
+      - snn-simulator
+      - gan-inference
+
+  # Stimulus controller for adaptive feedback
+  stimulus-controller:
+    build:
+      context: .
+      dockerfile: Dockerfile.snn
+    container_name: stimulus-controller
+    command: ["python", "src/stimulus_controller.py", "--config", "configs/control_config.yaml"]
+    depends_on:
+      - kafka
+    volumes:
+      - ./configs:/app/configs
+      - ./src:/app/src

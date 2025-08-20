@@ -1,0 +1,59 @@
+# GAN Configuration - Kaleidoscopic Visual Generation Parameters
+model:
+  architecture: "StyleGAN2"
+  latent_dim: 512
+  image_size: 256
+  num_channels: 3
+  use_hexagonal_conv: true
+
+generator:
+  hidden_dims: [512, 256, 128, 64, 32, 16]
+  activation: "leaky_relu"
+  normalization: "batch_norm"
+  dropout_rate: 0.1
+  spectral_norm: false
+
+hexagonal_conv:
+  kernel_size: 3
+  stride: 1
+  padding: 1
+  use_mask: true
+  symmetry_order: 6               # 6-fold rotational symmetry for kaleidoscope
+
+kaleidoscope:
+  symmetry_type: "rotational"     # rotational, mirror, both
+  num_segments: 6                 # Number of kaleidoscope segments
+  blend_factor: 0.8               # Blending between segments
+  color_palette: "psychedelic"    # psychedelic, rainbow, monochrome
+
+neural_conditioning:
+  firing_rate_weight: 0.4         # Weight of firing rate influence
+  grid_activity_weight: 0.3       # Weight of grid cell activity
+  modulation_weight: 0.5          # Weight of psychedelic modulation
+  temporal_smoothing: 0.2         # Temporal smoothing factor
+
+training:
+  batch_size: 32
+  learning_rate: 0.0002
+  beta1: 0.5
+  beta2: 0.999
+  num_epochs: 200
+  discriminator_steps: 1
+  generator_steps: 1
+
+loss_functions:
+  adversarial_weight: 1.0
+  perceptual_weight: 0.1
+  symmetry_weight: 0.2
+  style_weight: 0.05
+
+data_augmentation:
+  random_rotation: true
+  color_jitter: 0.1
+  brightness_jitter: 0.1
+  contrast_jitter: 0.1
+
+inference:
+  use_ema: true                   # Use exponential moving average weights
+  truncation_psi: 0.7             # Truncation parameter for style mixing
+  style_mixing_prob: 0.5          # Probability of style mixing
