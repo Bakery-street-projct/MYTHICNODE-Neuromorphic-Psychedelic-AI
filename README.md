@@ -27,7 +27,6 @@ See LICENSE.md for license details.
 
 ## Contact
 
-For inquiries, contact: licensing@bakerstreetlabs.com
 
 ## Sponsorship & Collaboration
 
