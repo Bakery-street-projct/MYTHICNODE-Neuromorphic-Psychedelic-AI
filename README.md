@@ -28,3 +28,12 @@ See LICENSE.md for license details.
 ## Contact
 
 For inquiries, contact: licensing@bakerstreetlabs.com
+
+## Sponsorship & Collaboration
+
+For sponsorship opportunities and research collaborations:
+- Email: iamthatiamresearch@gmail.com
+- Phone: +32 471 31 52 53
+- X (Twitter): @boozelee86
+
+We welcome funding partnerships to advance this cutting-edge neuromorphic research.
